@@ -179,14 +179,14 @@ class stripe_pay extends PaymentBase implements PaymentContract
 
 
 
-    protected function checkConfigureStatus(): bool
+    protected function checkFatalConfigureStatus(): bool
     {
         $configureStatus = true;
         $toCheck = 'LIVE';
         if ($this->getDefine('MODE') == 'Test') {
             $toCheck = 'TEST';
         }
-        if ($this->getDefine('PUB_KEY') == '' || $this->getDefine($toCheck . '_SECRET_KEY') == '') {
+        if ($this->getDefine($toCheck . '_PUB_KEY') == '' || $this->getDefine($toCheck . '_SECRET_KEY') == '') {
             $this->configureErrors[] = sprintf('(not configured - needs %s publishable and secret key)', $toCheck);
             $configureStatus = false;
         }
