@@ -4,6 +4,7 @@ document.head.appendChild(StripeScript);
 StripeScript.addEventListener("load", () => {
     if (stripeAlwaysShowForm) {
         $('#stripepay-intent-payment-element').show();
+        $('#pmt-stripe_pay').prop('checked', true).trigger('change');
     }
     if ($('#pmt-stripe_pay').is(':checked')) {
         $('#stripepay-intent-payment-element').show();
