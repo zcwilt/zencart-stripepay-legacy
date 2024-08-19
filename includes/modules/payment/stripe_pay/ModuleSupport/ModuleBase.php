@@ -73,6 +73,18 @@ abstract class ModuleBase
      */
     protected Logger $logger;
 
+    /**
+     * language suffixes to check for store title
+     * @var array
+     */
+    protected $storeLanguageSuffixes = ['TITLE', 'TEXT_TITLE', 'CATALOG_TITLE'];
+    /**
+     * language suffixes to check for admin title
+     * @var array
+     */
+    protected $adminLanguageSuffixes = ['TITLE_ADMIN', 'TEXT_TITLE_ADMIN', 'ADMIN_TITLE'];
+    
+
     public function __construct()
     {
         /**
@@ -130,24 +142,11 @@ abstract class ModuleBase
      */
     protected function getTitle(): string
     {
-        $title = $this->getDefine('TEXT_TITLE');
-        $title = $title ?? $this->getDefine(('TITLE'));
+        $title = $this->getTitleFromLanguageSuffix($this->storeLanguageSuffixes);
         if (IS_ADMIN_FLAG === true) {
             $title = $this->getAdminTitle($title);
         }
         return $title ?? '';
-    }
-    /**
-     * @return array
-     */
-    protected function setConfigurationKeys(): array
-    {
-        $local = [];
-        $common = $this->setCommonConfigurationKeys();
-        if (method_exists($this, 'addCustomConfigurationKeys')) {
-            $local = $this->addCustomConfigurationKeys();
-        }
-        return array_merge($common, $local);
     }
     /**
      * @param mixed $defaultTitle
@@ -155,7 +154,7 @@ abstract class ModuleBase
      */
     protected function getAdminTitle(?string $defaultTitle = null): string
     {
-        $title = $this->getDefine('TEXT_TITLE_ADMIN');
+        $title = $this->getTitleFromLanguageSuffix($this->adminLanguageSuffixes);
         $title = $title ?? $defaultTitle;
 
         if (!empty($this->version) && $this->version) {
@@ -171,6 +170,30 @@ abstract class ModuleBase
             $title .= '<span class="alert">' . $configureError . '</span>';
         }
         return $title;
+    }
+
+    protected function getTitleFromLanguageSuffix(array $languageSuffixes): ?string
+    {
+        $title = null;
+        foreach ($languageSuffixes as $languageSuffix) {
+            $title = $this->getDefine($languageSuffix);
+            if (!empty($title)) {
+                break;
+            }
+        }
+        return $title;
+    }
+    /**
+     * @return array
+     */
+    protected function setConfigurationKeys(): array
+    {
+        $local = [];
+        $common = $this->setCommonConfigurationKeys();
+        if (method_exists($this, 'addCustomConfigurationKeys')) {
+            $local = $this->addCustomConfigurationKeys();
+        }
+        return array_merge($common, $local);
     }
     /**
      * @return string
